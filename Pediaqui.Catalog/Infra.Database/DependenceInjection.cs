@@ -6,22 +6,21 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Infra.Database
+namespace Infra.Database;
+
+public static class DependenyInjection
 {
-    public static class DependenyInjection
+    public static IServiceCollection AddInfraData(this IServiceCollection services, IConfiguration configuration)
     {
-        public static IServiceCollection AddInfraData(this IServiceCollection services, IConfiguration configuration)
+        services.AddScoped<IProdutoRepository, ProdutoRepository>();
+        services.AddScoped<IClienteRepository, ClienteRepository>();
+
+        services.AddDbContext<DatabaseContext>(options =>
         {
-            services.AddScoped<IProdutoRepository, ProdutoRepository>();
-            services.AddScoped<IClienteRepository, ClienteRepository>();
+            var connectionString = configuration.GetConnectionString("Default");
+            options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+        });
 
-            services.AddDbContext<DatabaseContext>(options =>
-            {
-                var connectionString = configuration.GetConnectionString("Default");
-                options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
-            });
-
-            return services;
-        }
+        return services;
     }
 }
