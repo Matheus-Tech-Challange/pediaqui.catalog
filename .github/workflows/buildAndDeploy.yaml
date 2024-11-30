@@ -43,27 +43,12 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           dotnet tool install --global dotnet-sonarscanner
-          
-          # Encontrar o arquivo de cobertura específico
-          COVERAGE_FILE=$(find ./TestResults -name "coverage.cobertura.xml" | head -n 1)
-          
-          if [ -z "$COVERAGE_FILE" ]; then
-            echo "Coverage report not found."
-            exit 1
-          fi
-
-          # Iniciar o SonarScanner
           dotnet sonarscanner begin \
             /k:"Matheus-Tech-Challange_pediaqui.catalog" \
             /o:"matheus-tech-challange" \
             /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
             /d:sonar.host.url="https://sonarcloud.io" \
-            /d:sonar.coverageReportPaths="$COVERAGE_FILE"
-
-          # Rodar o build novamente (necessário após begin)
           dotnet build ./Pediaqui.Catalog/Pediaqui.Catalog.sln --configuration Release
-
-          # Finalizar o SonarScanner
           dotnet sonarscanner end /d:sonar.login=$SONAR_TOKEN
 
       # Verificar cobertura de testes
