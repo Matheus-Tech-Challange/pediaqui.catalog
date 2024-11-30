@@ -34,6 +34,9 @@ jobs:
           mkdir -p ./TestResults
           dotnet test ./Pediaqui.Catalog/Pediaqui.Catalog.sln --no-build --configuration Release --collect:"XPlat Code Coverage" --results-directory ./TestResults
 
+      - name: Debug Test Results
+        run: ls -R ./TestResults
+
       # Publicar relatório de cobertura para o SonarCloud
       - name: SonarCloud Scan
         env:
@@ -47,9 +50,14 @@ jobs:
       # Verificar cobertura de testes
       - name: Check coverage
         run: |
-          COVERAGE=$(grep -oP '(?<=<coverage>).*(?=</coverage>)' ./TestResults/**/coverage.cobertura.xml | awk -F. '{print $1}')
+          COVERAGE_FILE=$(find ./TestResults -name "coverage.opencover.xml" | head -n 1)
+          if [ -z "$COVERAGE_FILE" ]; then
+            echo "Coverage report not found."
+            exit 1
+          fi
+          COVERAGE=$(grep -oP '(?<=<coverage>).*(?=</coverage>)' "$COVERAGE_FILE" | awk -F. '{print $1}')
           if [ -z "$COVERAGE" ]; then
-            echo "Coverage report not found or empty."
+            echo "Coverage value is empty."
             exit 1
           fi
           if [ "$COVERAGE" -lt 70 ]; then
