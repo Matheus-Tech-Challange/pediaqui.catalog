@@ -48,8 +48,7 @@ jobs:
             /o:"matheus-tech-challange" \
             /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
             /d:sonar.host.url="https://sonarcloud.io" \
-            /d:sonar.cs.opencover.reportsPaths="./TestResults/**"
-            /d:sonar.coverageReportPaths="./TestResults/**"  
+            /d:sonar.cs.opencover.reportsPaths="./TestResults/**/*.cobertura.xml"
           dotnet build ./Pediaqui.Catalog/Pediaqui.Catalog.sln --configuration Release          
           dotnet sonarscanner end /d:sonar.login=$SONAR_TOKEN
 
