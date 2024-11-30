@@ -90,7 +90,7 @@ resource "kubernetes_service" "svc_catalog_loadbalancer" {
     }
 
     selector = {
-      app = "catalog"
+      app = "catalog-deployment-tf"
     }
 
     type = "LoadBalancer"
