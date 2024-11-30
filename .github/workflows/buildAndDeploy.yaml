@@ -32,7 +32,7 @@ jobs:
       - name: Run tests
         run: |
           mkdir -p ./TestResults
-          dotnet test ./Pediaqui.Catalog/Pediaqui.Catalog.sln --no-build --configuration Release --collect:"XPlat Code Coverage" --results-directory ./TestResults
+          dotnet test ./Pediaqui.Catalog/Pediaqui.Catalog.sln --no-build --configuration Release --collect:"XPlat Code Coverage" /p:CollectCoverage=true /p:CoverletOutputFormat=opencover --results-directory ./TestResults
 
       - name: Debug Test Results
         run: ls -R ./TestResults
