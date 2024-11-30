@@ -4,7 +4,7 @@ namespace Domain.Common.Entities;
 
 public abstract class Entity
 {
-    public int Id { get; private set; }
+    public int Id { get; set; }
     public bool Valid { get; private set; }
     public bool Invalid => !Valid;
 

@@ -1,0 +1,52 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout do código
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Configurar .NET
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0'
+
+      # Instalar dependências
+      - name: Restore dependencies
+        run: dotnet restore
+
+      # Build do projeto
+      - name: Build project
+        run: dotnet build --no-restore --configuration Release
+
+      # Executar testes e gerar relatório de cobertura
+      - name: Run tests
+        run: dotnet test --no-build --configuration Release --collect:"XPlat Code Coverage"
+
+      # Publicar relatório de cobertura para o SonarCloud
+      - name: SonarCloud Scan
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          dotnet tool install --global dotnet-sonarscanner
+          dotnet sonarscanner begin /k:"seu-projeto-no-sonarcloud" /d:sonar.login=$SONAR_TOKEN /d:sonar.cs.opencover.reportsPaths=**/coverage.opencover.xml
+          dotnet build
+          dotnet sonarscanner end /d:sonar.login=$SONAR_TOKEN
+
+      # Verificar cobertura de testes
+      - name: Check coverage
+        run: |
+          COVERAGE=$(grep -oP '(?<=<coverage>).*(?=</coverage>)' **/coverage.opencover.xml | awk -F. '{print $1}')
+          if [ "$COVERAGE" -lt 70 ]; then
+            echo "Test coverage ($COVERAGE%) is below 70%. Failing the build."
+            exit 1
+          fi
