@@ -55,7 +55,7 @@ jobs:
             echo "Coverage report not found."
             exit 1
           fi
-          COVERAGE=$(grep -oP '(?<=<coverage>).*(?=</coverage>)' "$COVERAGE_FILE" | awk -F. '{print $1}')
+          COVERAGE=$(grep -oP '(?<=line-rate=")[0-9]+(\.[0-9]+)?' "$COVERAGE_FILE" | awk '{print int($1 * 100)}')
           if [ -z "$COVERAGE" ]; then
             echo "Coverage value is empty."
             exit 1
