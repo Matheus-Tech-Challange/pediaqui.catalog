@@ -8,7 +8,7 @@ locals {
 
 resource "kubernetes_secret" "catalog_secret" {
   metadata {
-    name = "catalog_secret"
+    name = "catalog-secret"
   }
 
   data = {
@@ -19,7 +19,7 @@ resource "kubernetes_secret" "catalog_secret" {
 resource "kubernetes_deployment" "catalog_deployment" {
   depends_on = [ kubernetes_secret.catalog_secret ]
   metadata {
-    name = "catalog_deployment_tf"
+    name = "catalog-deployment-tf"
     labels = {
       nome = "catalog"
     }
@@ -52,7 +52,7 @@ resource "kubernetes_deployment" "catalog_deployment" {
 
           env_from {
             secret_ref {
-              name = "catalog_secret"
+              name = "catalog-secret"
             }
           }
 
@@ -96,13 +96,13 @@ resource "kubernetes_deployment" "catalog_deployment" {
 
 resource "kubernetes_horizontal_pod_autoscaler_v2" "catalog_hpa" {
   metadata {
-    name = "catalog_hpa"
+    name = "catalog-hpa"
   }
 
   spec {
     scale_target_ref {
       kind        = "Deployment"
-      name        = "catalog_deployment"
+      name        = "catalog-deployment"
       api_version = "apps/v1"
     }
 
