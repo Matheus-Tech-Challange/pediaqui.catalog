@@ -43,7 +43,12 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           dotnet tool install --global dotnet-sonarscanner
-          dotnet sonarscanner begin /k:"Matheus-Tech-Challange_pediaqui.catalog" /o:"matheus-tech-challange" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths=**/coverage.*.xml
+          dotnet sonarscanner begin \
+            /k:"Matheus-Tech-Challange_pediaqui.catalog" \
+            /o:"matheus-tech-challange" \
+            /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
+            /d:sonar.host.url="https://sonarcloud.io" \
+            /d:sonar.cs.opencover.reportsPaths=./TestResults/**/coverage.*.xml
           dotnet build ./Pediaqui.Catalog/Pediaqui.Catalog.sln --configuration Release
           dotnet sonarscanner end /d:sonar.login=$SONAR_TOKEN
 
