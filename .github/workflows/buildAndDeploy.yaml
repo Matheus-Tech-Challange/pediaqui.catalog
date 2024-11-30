@@ -43,15 +43,11 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           dotnet tool install --global dotnet-sonarscanner
-          dotnet sonarscanner begin \
-            /k:"Matheus-Tech-Challange_pediaqui.catalog" \
-            /o:"matheus-tech-challange" \
-            /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
-            /d:sonar.host.url="https://sonarcloud.io" \
+          dotnet sonarscanner begin /k:"Matheus-Tech-Challange_pediaqui.catalog" /o:"matheus-tech-challange" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths=**/coverage.*.xml
           dotnet build ./Pediaqui.Catalog/Pediaqui.Catalog.sln --configuration Release
           dotnet sonarscanner end /d:sonar.login=$SONAR_TOKEN
 
-      # Verificar cobertura de testes
+      # Step 6: Verificar cobertura mínima de 70%
       - name: Check coverage
         run: |
           COVERAGE_FILE=$(find ./TestResults -name "coverage.cobertura.xml" | head -n 1)
@@ -69,4 +65,4 @@ jobs:
             exit 1
           else
             echo "Test coverage ($COVERAGE%) meets the requirement."
-          fi
+          fi  
