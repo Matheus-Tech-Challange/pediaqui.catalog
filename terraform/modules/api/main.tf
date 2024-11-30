@@ -75,22 +75,22 @@ resource "kubernetes_deployment" "catalog_deployment" {
 resource "kubernetes_service" "svc_catalog_loadbalancer" {
   metadata {
     name = "svc-catalog-loadbalancer"
-    # annotations = {
-    #   "service.beta.kubernetes.io/aws-load-balancer-type": "nlb"
-    #   "service.beta.kubernetes.io/aws-load-balancer-scheme": "internal"
-    #   "service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled": "true"
-    # }
+    annotations = {
+      "service.beta.kubernetes.io/aws-load-balancer-type": "nlb" # ou "clb" para Classic
+      "service.beta.kubernetes.io/aws-load-balancer-scheme": "internet-facing" # público
+      "service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled": "true"
+    }
   }
 
   spec {
     port {
       port        = 80
       target_port = 80
-      node_port   = 30007
+      #node_port   = 30007
     }
 
     selector = {
-      app = "catalog-deployment-tf"
+      app = "catalog"
     }
 
     type = "LoadBalancer"
