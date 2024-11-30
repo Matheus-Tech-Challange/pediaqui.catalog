@@ -31,15 +31,13 @@ jobs:
       # Executar testes e gerar relatório de cobertura
       - name: Run tests
         run: |
-          mkdir -p ./TestResults
-          dotnet test ./Pediaqui.Catalog/Pediaqui.Catalog.sln \
-            --collect:"XPlat Code Coverage" \
+          dotnet test test ./Pediaqui.Catalog/Pediaqui.Catalog.sln \
             /p:CollectCoverage=true \
             /p:CoverletOutputFormat=opencover \
-            --results-directory ./TestResults
+            /p:CoverletOutput=./coverage.opencover.xml            
 
       - name: Debug Test Results
-        run: ls -R ./TestResults
+        run: ls -R ./*.opencover.xml
 
       # Publicar relatório de cobertura para o SonarCloud
       - name: SonarCloud Scan
@@ -52,7 +50,7 @@ jobs:
             /o:"matheus-tech-challange" \
             /d:sonar.host.url="https://sonarcloud.io" \
             /d:sonar.login="${{ secrets.SONAR_TOKEN }}" \
-            /d:sonar.cs.opencover.reportsPaths=./TestResults/**/coverage.cobertura.xml
+            /d:sonar.cs.opencover.reportsPaths=./coverage.opencover.xml
           dotnet build ./Pediaqui.Catalog/Pediaqui.Catalog.sln --configuration Release          
           dotnet sonarscanner end /d:sonar.login=$SONAR_TOKEN
 
