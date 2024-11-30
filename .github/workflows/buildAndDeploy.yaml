@@ -30,7 +30,9 @@ jobs:
 
       # Executar testes e gerar relatório de cobertura
       - name: Run tests
-        run: dotnet test ./Pediaqui.Catalog/Pediaqui.Catalog.sln --no-build --configuration Release --collect:"XPlat Code Coverage"
+        run: |
+          mkdir -p ./TestResults
+          dotnet test ./Pediaqui.Catalog/Pediaqui.Catalog.sln --no-build --configuration Release --collect:"XPlat Code Coverage" --results-directory ./TestResults
 
       # Publicar relatório de cobertura para o SonarCloud
       - name: SonarCloud Scan
@@ -45,8 +47,14 @@ jobs:
       # Verificar cobertura de testes
       - name: Check coverage
         run: |
-          COVERAGE=$(grep -oP '(?<=<coverage>).*(?=</coverage>)' **/coverage.opencover.xml | awk -F. '{print $1}')
+          COVERAGE=$(grep -oP '(?<=<coverage>).*(?=</coverage>)' ./TestResults/**/coverage.opencover.xml | awk -F. '{print $1}')
+          if [ -z "$COVERAGE" ]; then
+            echo "Coverage report not found or empty."
+            exit 1
+          fi
           if [ "$COVERAGE" -lt 70 ]; then
             echo "Test coverage ($COVERAGE%) is below 70%. Failing the build."
             exit 1
+          else
+            echo "Test coverage ($COVERAGE%) meets the requirement."
           fi
