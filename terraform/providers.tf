@@ -5,7 +5,7 @@ terraform {
     local = ">=2.1.0"
   }
   backend "s3" {
-    bucket = "tc-api-bucket"
+    bucket = "pediaqui-catalog-bucket"
     key = "terraform.tfstate"
     region = "us-east-1"
   }
