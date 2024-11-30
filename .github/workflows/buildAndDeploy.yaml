@@ -22,15 +22,15 @@ jobs:
 
       # Instalar dependências
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore ./Pediaqui.Catalog/Pediaqui.Catalog.sln
 
       # Build do projeto
       - name: Build project
-        run: dotnet build --no-restore --configuration Release
+        run: dotnet build ./Pediaqui.Catalog/Pediaqui.Catalog.sln --no-restore --configuration Release
 
       # Executar testes e gerar relatório de cobertura
       - name: Run tests
-        run: dotnet test --no-build --configuration Release --collect:"XPlat Code Coverage"
+        run: dotnet test ./Pediaqui.Catalog/Pediaqui.Catalog.sln --no-build --configuration Release --collect:"XPlat Code Coverage"
 
       # Publicar relatório de cobertura para o SonarCloud
       - name: SonarCloud Scan
