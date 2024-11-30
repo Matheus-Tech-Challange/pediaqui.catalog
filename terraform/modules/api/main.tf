@@ -66,57 +66,6 @@ resource "kubernetes_deployment" "catalog_deployment" {
               memory = "200Mi"
             }
           }
-
-          liveness_probe {
-            http_get {
-              port = 80
-              path = "/api/produtos/categoria/0"
-            }
-            period_seconds        = 30
-            failure_threshold     = 5
-            initial_delay_seconds = 40
-            timeout_seconds = 15
-          }
-
-          readiness_probe {
-            http_get {
-              port = 80
-              path = "/api/produtos/categoria/0"
-            }
-            period_seconds        = 30
-            failure_threshold     = 5
-            initial_delay_seconds = 40
-            timeout_seconds = 15
-          }
-        }
-      }
-    }
-  }
-}
-
-resource "kubernetes_horizontal_pod_autoscaler_v2" "catalog_hpa" {
-  metadata {
-    name = "catalog-hpa"
-  }
-
-  spec {
-    scale_target_ref {
-      kind        = "Deployment"
-      name        = "catalog-deployment"
-      api_version = "apps/v1"
-    }
-
-    min_replicas = 1
-    max_replicas = 2
-
-    metric {
-      type = "ContainerResource"
-      container_resource {
-        container = "api"
-        name      = "cpu"
-        target {
-          average_utilization = 65
-          type = "Utilization"
         }
       }
     }
@@ -126,11 +75,11 @@ resource "kubernetes_horizontal_pod_autoscaler_v2" "catalog_hpa" {
 resource "kubernetes_service" "svc_catalog_loadbalancer" {
   metadata {
     name = "svc-catalog-loadbalancer"
-    annotations = {
-      "service.beta.kubernetes.io/aws-load-balancer-type": "nlb"
-      "service.beta.kubernetes.io/aws-load-balancer-scheme": "internal"
-      "service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled": "true"
-    }
+    # annotations = {
+    #   "service.beta.kubernetes.io/aws-load-balancer-type": "nlb"
+    #   "service.beta.kubernetes.io/aws-load-balancer-scheme": "internal"
+    #   "service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled": "true"
+    # }
   }
 
   spec {
