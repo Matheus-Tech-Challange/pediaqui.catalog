@@ -6,9 +6,9 @@ locals {
   connection_string = "Server=${trimsuffix(data.aws_db_instance.database.endpoint, ":${data.aws_db_instance.database.port}")};Port=${data.aws_db_instance.database.port};Database=${data.aws_db_instance.database.db_name};Uid=${var.db_user};Pwd=${var.db_password};"
 }
 
-resource "kubernetes_secret" "api-secret" {
+resource "kubernetes_secret" "catalog_secret" {
   metadata {
-    name = "api-secret"
+    name = "catalog_secret"
   }
 
   data = {
@@ -16,12 +16,12 @@ resource "kubernetes_secret" "api-secret" {
   }
 }
 
-resource "kubernetes_deployment" "api_deployment" {
-  depends_on = [ kubernetes_secret.api-secret ]
+resource "kubernetes_deployment" "catalog_deployment" {
+  depends_on = [ kubernetes_secret.catalog_secret ]
   metadata {
-    name = "api-deployment-tf"
+    name = "catalog_deployment_tf"
     labels = {
-      nome = "api"
+      nome = "catalog"
     }
   }
 
@@ -30,20 +30,20 @@ resource "kubernetes_deployment" "api_deployment" {
 
     selector {
       match_labels = {
-        nome = "api"
+        nome = "catalog"
       }
     }
 
     template {
       metadata {
         labels = {
-          nome = "api"
+          nome = "catalog"
         }
       }
 
       spec {
         container {
-          name  = "api"
+          name  = "catalog"
           image = var.ecr_repository_name
 
           port {
@@ -52,7 +52,7 @@ resource "kubernetes_deployment" "api_deployment" {
 
           env_from {
             secret_ref {
-              name = "api-secret"
+              name = "catalog_secret"
             }
           }
 
@@ -70,7 +70,7 @@ resource "kubernetes_deployment" "api_deployment" {
           liveness_probe {
             http_get {
               port = 80
-              path = "/api/pedido"
+              path = "/api/produtos/categoria/0"
             }
             period_seconds        = 30
             failure_threshold     = 5
@@ -81,7 +81,7 @@ resource "kubernetes_deployment" "api_deployment" {
           readiness_probe {
             http_get {
               port = 80
-              path = "/api/pedido"
+              path = "/api/produtos/categoria/0"
             }
             period_seconds        = 30
             failure_threshold     = 5
@@ -94,15 +94,15 @@ resource "kubernetes_deployment" "api_deployment" {
   }
 }
 
-resource "kubernetes_horizontal_pod_autoscaler_v2" "api_hpa" {
+resource "kubernetes_horizontal_pod_autoscaler_v2" "catalog_hpa" {
   metadata {
-    name = "api-hpa"
+    name = "catalog_hpa"
   }
 
   spec {
     scale_target_ref {
       kind        = "Deployment"
-      name        = "api-deployment"
+      name        = "catalog_deployment"
       api_version = "apps/v1"
     }
 
@@ -123,13 +123,10 @@ resource "kubernetes_horizontal_pod_autoscaler_v2" "api_hpa" {
   }
 }
 
-resource "kubernetes_service" "svc_api_loadbalancer" {
+resource "kubernetes_service" "svc_catalog_loadbalancer" {
   metadata {
-    name = "svc-api-loadbalancer"
+    name = "svc-catalog-loadbalancer"
     annotations = {
-      # "service.beta.kubernetes.io/aws-load-balancer-internal": "true"
-      # "service.beta.kubernetes.io/aws-load-balancer-type": "nlb"
-      # "service.beta.kubernetes.io/aws-load-balancer-nlb-target-type": "ip"
       "service.beta.kubernetes.io/aws-load-balancer-type": "nlb"
       "service.beta.kubernetes.io/aws-load-balancer-scheme": "internal"
       "service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled": "true"
@@ -144,7 +141,7 @@ resource "kubernetes_service" "svc_api_loadbalancer" {
     }
 
     selector = {
-      app = "api"
+      app = "catalog"
     }
 
     type = "LoadBalancer"
