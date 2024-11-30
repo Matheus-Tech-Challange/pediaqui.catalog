@@ -47,7 +47,7 @@ jobs:
       # Verificar cobertura de testes
       - name: Check coverage
         run: |
-          COVERAGE=$(grep -oP '(?<=<coverage>).*(?=</coverage>)' ./TestResults/**/coverage.opencover.xml | awk -F. '{print $1}')
+          COVERAGE=$(grep -oP '(?<=<coverage>).*(?=</coverage>)' ./TestResults/**/coverage.cobertura.xml | awk -F. '{print $1}')
           if [ -z "$COVERAGE" ]; then
             echo "Coverage report not found or empty."
             exit 1
