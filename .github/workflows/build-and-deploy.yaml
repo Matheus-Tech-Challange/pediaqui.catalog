@@ -32,7 +32,11 @@ jobs:
       - name: Run tests
         run: |
           mkdir -p ./TestResults
-          dotnet test ./Pediaqui.Catalog/Pediaqui.Catalog.sln --no-build --configuration Release --collect:"XPlat Code Coverage" /p:CollectCoverage=true /p:CoverletOutputFormat=opencover --results-directory ./TestResults
+          dotnet test ./Pediaqui.Catalog/Pediaqui.Catalog.sln \
+            --collect:"XPlat Code Coverage" \
+            /p:CollectCoverage=true \
+            /p:CoverletOutputFormat=opencover \
+            --results-directory ./TestResults
 
       - name: Debug Test Results
         run: ls -R ./TestResults
@@ -42,15 +46,16 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          dotnet tool install --global dotnet-sonarscanner
+          dotnet tool install --global dotnet-coverage
           dotnet sonarscanner begin \
-            /k:"Matheus-Tech-Challange_pediaqui.catalog" \
-            /o:"matheus-tech-challange" \
-            /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
-            /d:sonar.host.url="https://sonarcloud.io" \
-            /d:sonar.cs.opencover.reportsPaths=./TestResults/**/coverage.*.xml
-          dotnet build ./Pediaqui.Catalog/Pediaqui.Catalog.sln --configuration Release
-          dotnet sonarscanner end /d:sonar.login=$SONAR_TOKEN
+              /k:"Matheus-Tech-Challange_pediaqui.catalog" \
+              /o:"matheus-tech-challange" \
+              /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
+              /d:sonar.host.url="https://sonarcloud.io" \
+              /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
+          dotnet build --no-incremental
+          dotnet-coverage collect "dotnet test" -f xml -o "coverage.xml"
+          dotnet sonarscanner end /d:sonar.login=$SONAR_TOKEN          
 
       # Step 6: Verificar cobertura mínima de 70%
       - name: Check coverage
