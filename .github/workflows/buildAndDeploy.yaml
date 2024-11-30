@@ -34,6 +34,7 @@ jobs:
           mkdir -p ./TestResults
           dotnet test ./Pediaqui.Catalog/Pediaqui.Catalog.sln --no-build --configuration Release --collect:"XPlat Code Coverage" /p:CollectCoverage=true /p:CoverletOutputFormat=opencover --results-directory ./TestResults
 
+      # Debug Test Results
       - name: Debug Test Results
         run: ls -R ./TestResults
 
@@ -48,9 +49,9 @@ jobs:
             /o:"matheus-tech-challange" \
             /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
             /d:sonar.host.url="https://sonarcloud.io" \
-            /d:sonar.cs.opencover.reportsPaths="./TestResults/**/*.cobertura.xml"
-            /d:sonar.coverageReportPaths=$(find ./TestResults -name "coverage.cobertura.xml" | head -n 1)
-          dotnet build ./Pediaqui.Catalog/Pediaqui.Catalog.sln --configuration Release          
+            /d:sonar.coverageReportPaths="./TestResults/**/*.cobertura.xml"
+
+          dotnet build ./Pediaqui.Catalog/Pediaqui.Catalog.sln --configuration Release
           dotnet sonarscanner end /d:sonar.login=$SONAR_TOKEN
 
       # Verificar cobertura de testes
