@@ -28,13 +28,12 @@ jobs:
       - name: Build project
         run: dotnet build ./Pediaqui.Catalog/Pediaqui.Catalog.sln --no-restore --configuration Release
 
-      # Executar testes e gerar relatório de cobertura no formato OpenCover
+      # Executar testes e gerar relatório de cobertura
       - name: Run tests
         run: |
           mkdir -p ./TestResults
           dotnet test ./Pediaqui.Catalog/Pediaqui.Catalog.sln --no-build --configuration Release --collect:"XPlat Code Coverage" /p:CollectCoverage=true /p:CoverletOutputFormat=opencover --results-directory ./TestResults
 
-      # Debug Test Results
       - name: Debug Test Results
         run: ls -R ./TestResults
 
@@ -46,7 +45,7 @@ jobs:
           dotnet tool install --global dotnet-sonarscanner
           
           # Encontrar o arquivo de cobertura específico
-          COVERAGE_FILE=$(find ./TestResults -name "coverage.opencover.xml" | head -n 1)
+          COVERAGE_FILE=$(find ./TestResults -name "coverage.cobertura.xml" | head -n 1)
           
           if [ -z "$COVERAGE_FILE" ]; then
             echo "Coverage report not found."
@@ -70,7 +69,7 @@ jobs:
       # Verificar cobertura de testes
       - name: Check coverage
         run: |
-          COVERAGE_FILE=$(find ./TestResults -name "coverage.opencover.xml" | head -n 1)
+          COVERAGE_FILE=$(find ./TestResults -name "coverage.cobertura.xml" | head -n 1)
           if [ -z "$COVERAGE_FILE" ]; then
             echo "Coverage report not found."
             exit 1
