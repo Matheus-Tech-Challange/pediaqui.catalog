@@ -50,7 +50,7 @@ jobs:
       # Verificar cobertura de testes
       - name: Check coverage
         run: |
-          COVERAGE_FILE=$(find ./TestResults -name "coverage.opencover.xml" | head -n 1)
+          COVERAGE_FILE=$(find ./TestResults -name "coverage.cobertura.xml" | head -n 1)
           if [ -z "$COVERAGE_FILE" ]; then
             echo "Coverage report not found."
             exit 1
